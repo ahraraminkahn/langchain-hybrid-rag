@@ -1,59 +1,61 @@
 # Hybrid RAG PDF Question Answering
 
-A Retrieval-Augmented Generation (RAG) project that loads information from PDF documents, splits the content into smaller chunks, converts the text into vector embeddings, stores embeddings in ChromaDB, and combines **semantic vector search** with **BM25 keyword search** to retrieve relevant information.
+A Retrieval-Augmented Generation (RAG) project that loads information from PDF documents, splits the content into smaller chunks, converts the text into vector embeddings, stores embeddings in ChromaDB, and combines semantic vector search with BM25 keyword search to retrieve relevant information.
 
 The retrieved context is then passed to an OpenAI language model to generate a response to the user's query.
 
-## 🚀 Project Overview
+## Project Overview
 
-This project demonstrates a **Hybrid Retrieval-Augmented Generation (RAG)** pipeline using:
+This project demonstrates a Hybrid Retrieval-Augmented Generation (RAG) pipeline using:
 
-* **LangChain** for building the RAG workflow
-* **PyPDF** for loading PDF documents
-* **RecursiveCharacterTextSplitter** for document chunking
-* **Sentence Transformers** for generating embeddings
-* **ChromaDB** as the vector database
-* **BM25** for keyword-based retrieval
-* **EnsembleRetriever** for combining semantic and keyword retrieval
-* **OpenAI GPT-4o-mini** for generating responses
+* LangChain for building the RAG workflow
+* PyPDF for loading PDF documents
+* RecursiveCharacterTextSplitter for document chunking
+* Sentence Transformers for generating embeddings
+* ChromaDB as the vector database
+* BM25 for keyword-based retrieval
+* EnsembleRetriever for combining semantic and keyword retrieval
+* OpenAI GPT-4o-mini for generating responses
 
 ### Pipeline
 
 ```text
 PDF Document
-     │
-     ▼
+     |
+     v
 PDF Loader
-     │
-     ▼
+     |
+     v
 Document Text
-     │
-     ▼
+     |
+     v
 Text Chunking
-     │
-     ▼
+     |
+     v
 Sentence Transformer Embeddings
-     │
-     ├───────────────┐
-     ▼               ▼
+     |
+     +----------------+
+     |                |
+     v                v
 Vector Search      BM25 Search
 (ChromaDB)         (Keywords)
-     │               │
-     └───────┬───────┘
-             ▼
+     |                |
+     +-------+--------+
+             |
+             v
       Hybrid Retriever
-             │
-             ▼
+             |
+             v
       Relevant Context
-             │
-             ▼
-       OpenAI LLM
-             │
-             ▼
-          Answer
+             |
+             v
+          OpenAI LLM
+             |
+             v
+           Answer
 ```
 
-## 📌 Features
+## Features
 
 ### 1. PDF Document Loading
 
@@ -67,8 +69,6 @@ docs = loader.load()
 ```
 
 Each PDF page is represented as a LangChain `Document`.
-
----
 
 ### 2. Document Chunking
 
@@ -87,8 +87,6 @@ chunks = text_splitter.split_documents(docs)
 ```
 
 Chunking makes it easier for the retrieval system to find relevant portions of a document.
-
----
 
 ### 3. Text Embeddings
 
@@ -110,8 +108,6 @@ embeddings = HuggingFaceEmbeddings(
 
 These vectors represent the semantic meaning of the text.
 
----
-
 ### 4. ChromaDB Vector Store
 
 ChromaDB is used as the vector database.
@@ -128,8 +124,6 @@ vector_store = Chroma(
 
 The vector database allows semantic similarity searches over the document content.
 
----
-
 ### 5. BM25 Keyword Retrieval
 
 The project also uses BM25 for traditional keyword-based retrieval.
@@ -142,8 +136,6 @@ bm25_retriever.k = 3
 ```
 
 BM25 is useful when the exact words in the user's query are important.
-
----
 
 ### 6. Hybrid Retrieval
 
@@ -164,13 +156,11 @@ retriever = EnsembleRetriever(
 The weights give both retrievers equal importance.
 
 ```text
-Vector Search  →  50%
-BM25 Search    →  50%
+Vector Search  ->  50%
+BM25 Search    ->  50%
 ```
 
-This is called **hybrid retrieval**.
-
----
+This is called hybrid retrieval.
 
 ### 7. OpenAI LLM
 
@@ -187,9 +177,7 @@ llm = ChatOpenAI(
 
 The model uses the retrieved information to generate a response.
 
----
-
-## 🔍 Example Query
+## Example Query
 
 The notebook demonstrates a query similar to:
 
@@ -204,9 +192,7 @@ The hybrid retriever searches the document using both:
 
 The relevant retrieved text is then sent to the language model.
 
----
-
-## 🛠️ Installation
+## Installation
 
 Install the required packages:
 
@@ -224,28 +210,24 @@ pip install chromadb
 pip install rank_bm25
 ```
 
----
-
-## 📁 Suggested Project Structure
+## Suggested Project Structure
 
 ```text
 hybrid-rag-pdf-qa/
-│
+|
 ├── README.md
 ├── Untitled30.ipynb
 ├── requirements.txt
 ├── data/
 │   └── document.pdf
-│
+|
 └── chroma_db/
     └── ...
 ```
 
----
+## API Key Security
 
-## 🔑 API Key Security
-
-**Never upload an OpenAI API key directly to GitHub.**
+Never upload an OpenAI API key directly to GitHub.
 
 Use an environment variable instead:
 
@@ -259,12 +241,6 @@ llm = ChatOpenAI(
 )
 ```
 
-Set the API key in your environment:
-
-```bash
-export OPENAI_API_KEY="your-api-key"
-```
-
 For Google Colab:
 
 ```python
@@ -274,68 +250,64 @@ from google.colab import userdata
 os.environ["OPENAI_API_KEY"] = userdata.get("OPENAI_API_KEY")
 ```
 
-If an API key has already been exposed in a notebook that was uploaded or shared, **revoke/rotate that key immediately** and create a new one.
+If an API key has already been exposed in a notebook that was uploaded or shared, revoke or rotate that key immediately and create a new one.
 
----
+## How the RAG System Works
 
-## ⚙️ How the RAG System Works
+The complete process can be summarized as follows.
 
-The complete process can be summarized as:
-
-### Step 1 — Load
+### Step 1 - Load
 
 ```text
-PDF → Documents
+PDF -> Documents
 ```
 
-### Step 2 — Split
+### Step 2 - Split
 
 ```text
-Documents → Smaller Chunks
+Documents -> Smaller Chunks
 ```
 
-### Step 3 — Embed
+### Step 3 - Embed
 
 ```text
-Chunks → Numerical Vectors
+Chunks -> Numerical Vectors
 ```
 
-### Step 4 — Store
+### Step 4 - Store
 
 ```text
-Vectors → ChromaDB
+Vectors -> ChromaDB
 ```
 
-### Step 5 — Retrieve
+### Step 5 - Retrieve
 
 ```text
 User Query
-     │
-     ├── Vector Similarity Search
-     │
-     └── BM25 Keyword Search
-             │
-             ▼
+     |
+     +-- Vector Similarity Search
+     |
+     +-- BM25 Keyword Search
+              |
+              v
        Relevant Documents
 ```
 
-### Step 6 — Generate
+### Step 6 - Generate
 
 ```text
 Retrieved Context
        +
      User Query
-       │
-       ▼
+       |
+       v
     OpenAI LLM
-       │
-       ▼
+       |
+       v
      Answer
 ```
 
----
-
-## 🎯 Technologies Used
+## Technologies Used
 
 | Technology                     | Purpose              |
 | ------------------------------ | -------------------- |
@@ -349,9 +321,7 @@ Retrieved Context
 | EnsembleRetriever              | Hybrid retrieval     |
 | OpenAI GPT-4o-mini             | Answer generation    |
 
----
-
-## 📚 Learning Objectives
+## Learning Objectives
 
 This project demonstrates the following RAG concepts:
 
@@ -368,13 +338,11 @@ This project demonstrates the following RAG concepts:
 * LLM integration
 * Retrieval-Augmented Generation
 
----
-
-## ⚠️ Current Implementation Notes
+## Current Implementation Notes
 
 The notebook is primarily a learning/prototype implementation. Before using it as a production RAG system, several improvements should be made:
 
-1. Store the **actual chunks** in ChromaDB rather than only creating the vector store.
+1. Store the actual chunks in ChromaDB rather than only creating the vector store.
 2. Ensure the vector retriever and BM25 retriever operate on the same intended chunked document set.
 3. Include the user's original query together with the retrieved context in the LLM prompt.
 4. Add a proper RAG prompt instructing the LLM to answer from the retrieved context.
@@ -382,9 +350,7 @@ The notebook is primarily a learning/prototype implementation. Before using it a
 6. Add error handling for missing PDFs, API failures, and empty retrieval results.
 7. Add a `.gitignore` file so `chroma_db/`, secrets, and temporary files are not uploaded.
 
----
-
-## 🔮 Future Improvements
+## Future Improvements
 
 Possible extensions include:
 
@@ -400,10 +366,8 @@ Possible extensions include:
 * Add evaluation metrics for retrieval quality
 * Add support for DOCX, TXT, and web documents
 
----
+## Project Status
 
-## 👨‍💻 Project Status
+Status: Learning / Prototype
 
-**Status:** Learning / Prototype
-
-This project was created to explore the fundamentals of **Hybrid RAG, semantic search, keyword retrieval, vector databases, and LLM-based question answering**.
+This project was created to explore the fundamentals of Hybrid RAG, semantic search, keyword retrieval, vector databases, and LLM-based question answering.
